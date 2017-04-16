@@ -226,6 +226,26 @@ class EqualTo < Struct.new(:left, :right)
     end
 end
 
+class BitwiseNOT < Struct.new(:right)
+    def to_s 
+        "(not #{right})"
+    end 
+    def inspect
+        "<#{self}>"
+    end 
+    def reducible?
+        true 
+    end 
+    def reduce(environment)
+        if right.reducible?
+            BitwiseNOT.new(right.reduce(environment))
+        else 
+            Number.new(~right.value)
+        end 
+    end
+end
+
+
 class Machine < Struct.new(:expression, :environment)
     def step
         self.expression = expression.reduce(environment) 
